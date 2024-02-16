@@ -1,0 +1,66 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'net.serenity-bdd.aggregator'
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.4.34")
+    }
+}
+
+ext {
+        serenityVersion = '4.0.12'
+        serenityCucumberVersion = '4.0.12'
+}
+
+dependencies {
+    implementation 'io.appium:java-client:8.5.1'
+    implementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-cucumber:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:$rootProject.ext.serenityVersion"
+    implementation "org.slf4j:slf4j-api:1.7.32"
+    implementation "ch.qos.logback:logback-classic:1.2.6"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.0"
+    testImplementation "junit:junit:4.13.2"
+}
+
+tasks.withType(Test) {
+    systemProperties = System.properties
+    maxParallelForks = Runtime.runtime.availableProcessors()
+
+
+    useJUnitPlatform {
+        includeEngines 'cucumber'
+    }
+
+    include '**/*Test.class'
+    include '**/*Tests.class'
+    include '**/*TestSuite.class'
+
+
+    testClassesDirs = fileTree(dir: 'src/test/java', include: '**/*')
+
+
+    classpath = files()
+    classpath += sourceSets.test.runtimeClasspath
+}
+
+gradle.startParameter.continueOnFailure = true
+
